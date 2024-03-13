@@ -1,0 +1,150 @@
+# 2023.12.12 Conclusion. 여기 바로 위 "Run with" 값을 반드시 [No Environment] => [prod] or [dev]로 변경해 준다.
+# 1. 실행 순서는 반드시 먼저, 아래 [3-1] or [3-2]를 제일 먼저 실행하여, [token] 값을 얻고,
+# 2. 그 [token] 값을 반드시 [http-client.env.json] 파일에 [token] 값으로 넣어 주어야 한다.
+
+POST http://localhost:8088/api/item
+Content-Type: application/json
+# 반드시 여기 [1줄]을 띄워야 하네...
+{}
+
+### 반드시, Content-Type 정보도 표기해야 하고, 다음 [1줄]을 띄워야 하네...
+POST http://localhost:8088/auth/loginJwt
+Content-Type: application/json
+
+{
+  "email": "rwkang0002@naver.com",
+  "password": "0000"
+}
+
+> {% client.global.set("token", response.body.json.token); %}
+
+###
+GET http://localhost:8088/posts1/list
+Content-Type: application/json
+Authorization: Bearer {{token}}
+# Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyd2thbmcwMDAyQG5hdmVyLmNvbSIsImlhdCI6MTcwOTg1MTU0OCwiZXhwIjoxNzA5OTM3OTQ4fQ.e8o-qaSQnf1xqJx4JnhX7SlaqK6rBiRiLSxa9o4x69s
+# 따옴표["]가 첫글자에 있으면 안 됨.
+
+###
+GET http://localhost:8088/posts2/list
+Content-Type: application/json
+Authorization: Bearer {{token}}
+# Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyd2thbmcwMDAyQG5hdmVyLmNvbSIsImlhdCI6MTcwOTg1MTU0OCwiZXhwIjoxNzA5OTM3OTQ4fQ.e8o-qaSQnf1xqJx4JnhX7SlaqK6rBiRiLSxa9o4x69s
+# 따옴표["]가 첫글자에 있으면 안 됨.
+
+### 위, 여기[GET http://localhost:8088/posts1/list]와 비교. [password] 값을 [null]로, [modifiedAt] 값을 [null]로 한다.
+GET http://localhost:8088/posts1/response
+Content-Type: application/json
+Authorization: Bearer {{token}}
+# Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyd2thbmcwMDAyQG5hdmVyLmNvbSIsImlhdCI6MTcwOTg1MTU0OCwiZXhwIjoxNzA5OTM3OTQ4fQ.e8o-qaSQnf1xqJx4JnhX7SlaqK6rBiRiLSxa9o4x69s
+# 따옴표["]가 첫글자에 있으면 안 됨.
+
+### 위, 여기[GET http://localhost:8088/posts1/list]와 비교. [password] 값을 [null]로, [modifiedAt] 값을 [createAt] 값으로 보여 준다.
+#       단, [table original data]는 그대로 [null] 임에 특히 주의.
+GET http://localhost:8088/posts1/mapper
+Content-Type: application/json
+Authorization: Bearer {{token}}
+# Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyd2thbmcwMDAyQG5hdmVyLmNvbSIsImlhdCI6MTcwOTg1MTU0OCwiZXhwIjoxNzA5OTM3OTQ4fQ.e8o-qaSQnf1xqJx4JnhX7SlaqK6rBiRiLSxa9o4x69s
+# 따옴표["]가 첫글자에 있으면 안 됨.
+
+
+###
+POST http://localhost:8088/posts1/id
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyd2thbmcwMDAyQG5hdmVyLmNvbSIsImlhdCI6MTcwOTg1MTgyMywiZXhwIjoxNzA5OTM4MjIzfQ.JcUoTpBObKG3yO0mtMbeKWtI0AWgDXoSY4ZLgoXtvnk,
+
+{
+  "id": 1
+}
+
+###
+POST http://localhost:8088/posts2/id
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyd2thbmcwMDAyQG5hdmVyLmNvbSIsImlhdCI6MTcwOTg1MTgyMywiZXhwIjoxNzA5OTM4MjIzfQ.JcUoTpBObKG3yO0mtMbeKWtI0AWgDXoSY4ZLgoXtvnk,
+
+{
+  "id": 3
+}
+
+###
+GET http://localhost:8088/posts1/id/3
+Content-Type: application/json
+Authorization: Bearer {{token}}
+# Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyd2thbmcwMDAyQG5hdmVyLmNvbSIsImlhdCI6MTcwOTg1MTU0OCwiZXhwIjoxNzA5OTM3OTQ4fQ.e8o-qaSQnf1xqJx4JnhX7SlaqK6rBiRiLSxa9o4x69s
+# 따옴표["]가 첫글자에 있으면 안 됨.
+
+
+###
+GET http://localhost:8088/posts1/title/타이틀 0003
+Content-Type: application/json
+Authorization: Bearer {{token}}
+# Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyd2thbmcwMDAyQG5hdmVyLmNvbSIsImlhdCI6MTcwOTg1MTU0OCwiZXhwIjoxNzA5OTM3OTQ4fQ.e8o-qaSQnf1xqJx4JnhX7SlaqK6rBiRiLSxa9o4x69s
+# 따옴표["]가 첫글자에 있으면 안 됨.
+
+
+###
+GET http://localhost:80/api/item?id=99
+Accept: application/json
+
+###
+GET http://localhost:8088/posts/2
+
+### [password] 컬럼까지 모든 Entity 자료가 표시
+GET http://localhost:8088/posts1/2
+Content-Type: application/json
+
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyd2thbmcwMDAyQG5hdmVyLmNvbSIsImlhdCI6MTcwOTg0ODM2NCwiZXhwIjoxNzA5OTM0NzY0fQ.sVpTERU7lHht27tnH63ucTE5Ae2jUcvZfTtxnsU6tAw"
+}
+
+### [password] 컬럼까지 모든 Entity 자료가 표시
+GET http://localhost:8088/posts1/list
+
+### [password] 컬럼을 뺀 자료. 그러나 modifiedAt 컬럼 값이 실제 테이블에 저장된 값이 표시. (만약 "null" 이면, 그대로 "null"로 표시됨)
+GET http://localhost:8088/posts1/response
+
+### [password] 컬럼을 뺀 자료. 그러나 modifiedAt 컬럼 값이, 사용자가 원하는 값으로 표시. (만약 "null" 이면, "createdAt" 값이 표시됨)
+GET http://localhost:8088/posts1/mapper
+
+### 여기는 "401" 에러. SecurityConfig.java.SecurityFilterChain().AntPathRequestMatcher() 여기에, "posts2"는 지정 없기 때문.
+GET http://localhost:8088/posts2/list
+Content-Type: application/json
+
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyd2thbmcwMDAyQG5hdmVyLmNvbSIsImlhdCI6MTcwOTg0NjcyNCwiZXhwIjoxNzA5OTMzMTI0fQ.2ru8pIoOaIbb3Ff3B3icD3pYMuNBRuen1M1tkGbdEgI"
+}
+
+### 여기는 "401" 에러. SecurityConfig.java.SecurityFilterChain().AntPathRequestMatcher() 여기에, "posts2"는 지정 없기 때문.
+POST http://localhost:8088/posts2/id
+Content-Type: application/json
+Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyd2thbmcwMDAyQG5hdmVyLmNvbSIsImlhdCI6MTcwOTg0ODc5NCwiZXhwIjoxNzA5OTM1MTk0fQ.5zLxE2xBUu8gmh7RUhey3NwjcvRuSXb83INFYyNW0Zk"
+# 따옴표["]가 첫글자에 있으면 안 됨.
+
+###
+POST http://localhost:8088/posts2/id
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyd2thbmcwMDAyQG5hdmVyLmNvbSIsImlhdCI6MTcwOTg1MTgyMywiZXhwIjoxNzA5OTM4MjIzfQ.JcUoTpBObKG3yO0mtMbeKWtI0AWgDXoSY4ZLgoXtvnk,
+
+{
+  "id": 3
+}
+
+###
+GET http://localhost:8088/posts1/title?title=타이틀 0001
+
+###
+GET http://localhost:8088/posts2/list
+
+###
+GET http://localhost:8088/subject/score/1
+
+###
+POST http://localhost:80/auth/login
+Content-Type: application/json
+
+{
+  "email": "rwkang0002@naver.com",
+  "password": "0000"
+}
+
+

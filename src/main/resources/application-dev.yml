@@ -1,0 +1,135 @@
+# 2023.09.25 Conclusion. 여기서는 "라우터" 기능만 하고,
+# "local", "dev", "prod", 즉, "local=로컬 컴퓨터=H2 DB", "dev=개발용 서버=MySQL", "prod=운영 서버=Oracle" 이렇게 구분하여,
+# .yml 파일을 관리한다.
+
+---
+server:
+  port: 8088
+
+---
+# Live Server
+spring:
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: false
+
+# https://oranthy.tistory.com/m/313 날씨 크롤링.
+--- # https://home.openweathermap.org/api_keys
+openweathermap:
+  key: "1fbfbf78015e00c092f0f0fcab9ff2da"
+
+--- # Thymeleaf
+spring:
+  thymeleaf:
+    cache: false # source reload, front-end reload nothing...
+    prefix: classpath:templates/
+    #    prefix: file:src/main/resources/templates # classpath:templates/
+    suffix: .html
+
+#--- # H2 DB
+#spring:
+#  # browser.브라우저에서 호출할 Path 정보: [http://localhost:8088/h2-console] H2 DB 로그인 창이 호출된다.
+#  h2:
+#    console:
+#      enabled: true
+#      path: /h2-console # [http://localhost:8088/h2-console] H2 DB 로그인 창이 호출된다.
+#  datasource:
+#    driver-class-name: org.h2.Driver # [http://localhost:8088/h2-console] H2 DB 로그인 창.Driver Class 값.
+#    url: jdbc:h2:~/test # [http://localhost:8088/h2-console] H2 DB 로그인 창.JDBC URL 값.
+#    username: sa
+#    password:
+
+--- # mysql DB
+spring:
+  datasource:
+    url: ENC(FDsnvImt/YaPpCisNLzh8Fx8c6sXl6a0AIp9CLTlIWzj+kh2MUHDYeTELnJyLHg8ObMtGLW7p4zfLnG3Z/Qkm1sKTPkILJPRMIcQzE7Q14qffw6oFFuVsw==)
+    # url: jdbc:mysql://localhost:3306/powerapp?serverTimezone=UTC&characterEncoding=UTF-8
+    driver-class-name: ENC(uUqoMM14aF3YxUrx4mbMMoA1meuXRbNgFAtKLWu37ZJE8alumdZjFw==)
+    # driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ENC(muc9NgC7JAvoW2VMyGJmVQ==)
+    # username: "sa"
+    password: ENC(dJCRCql0gN/hPdLE+CQWtHhRumVQa+3w)
+    # password: "*963210z"
+
+--- # JPA
+spring:
+  jpa:
+    #    database-platform: org.hibernate.dialect.MariaDB103Dialect # mariadb
+    #    database-platform: org.hibernate.dialect.mariadb53dialect # mariadb : 이건 안 된다네... 난 안 해봄.
+    #    database-platform: org.hibernate.dialect.MySQL5Dialect # 4강에서 적용한 것.
+    database-platform: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+    properties:
+      hibernate:
+        # 아래는 비 추천. 대신에 logging.level ~~ 사용을 추천.
+        # show_sql: true
+        format_sql: true
+    hibernate:
+      ddl-auto: none # 여기는 운영 시에는 반드시 "Update" 또는 "Valid "로 전환해야 한다.
+    #      ddl-auto: create # 여기는 운영 시에는 반드시 "Update" 또는 "Valid "로 전환해야 한다.
+    #      ddl-auto: create-drop # 여기는 운영 시에는 반드시 "Update" 또는 "Valid "로 전환해야 한다.
+    #      ddl-auto: update # 여기는 운영 시에는 반드시 "Update" 또는 "Valid "로 전환해야 한다.
+    generate-ddl: true
+
+---
+# 위 [show_sql: true] 이것은 비 추천하고, 아래 logging 방식을 추천하네...
+# https://www.baeldung.com/sql-logging-spring-boot
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+#--- Spring Security 진행 시에는 위의 logging 삭제.
+
+
+
+---
+mybatis:
+  # 아래 classpath = resources 를 의미한다.
+  mapper-locations: classpath:mybatis/mapper/mysql/**/*.xml
+  type-handlers-package: shop.onekorea.springboot.mapper.typehandler
+  # UUID(postId) 값을 찍어 주기 위해서는, mapper 폴더에, typehandler/UuidTypeHandler.java 클래스가 반드시 있어야 한다.
+  type-aliases-package: shop.onekorea.springboot.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    default-statement-timeout: 30
+    default-fetch-size: 100
+    # 한번에 DB에서 들고 올 수 있는 건수: 100건
+
+
+# 2023.09.25 Conclusion. 아래 "MySql" DB를 연결하게 되면, 위의 "H2" DB 연결이 안 되어,
+# "http://localhost:8080/h2-console" 연결할 때, 아래와 같은 에러가 발생한다.
+# => Error
+# Database "C:/Users?Administrator/test" not found, either pre-create it or allow remote database creation (not recommended in secure environments) [90149-224] 90149/90149 (Help)
+
+---
+## MySql DB
+#spring:
+#  datasource:
+#    #    mysql: => ***** 여기 라인이 들어 가면 절대 안 됨: 에러 발생: 들여쓰기는 상관이 없네 *****
+#    # 2023.07.21 Conclusion. 여기서 에러나면, cmd/services.msc/MySQL/RB:시작 =====> 구동시켜야 된다.
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://localhost:3306/powerapp?serverTimezone=UTC&characterEncoding=UTF-8
+#    username: "sa"
+#    password: "*963210z" # 비밀 번호가 [특수 문자]로 시작할 때는 반드시 따옴표로 묶어줘야 한다.
+#    # 여기 따옴표도 에러 남: url: jdbc:mysql://localhost:3306/"powerppsc"?serverTimezone=UTC&characterEncoding=UTF-8
+#    # 2023.07.21 Conclusion. 여기서 에러나면, cmd/services.msc/MySQL/RB:시작 =====> 구동시켜야 된다.
+
+#--- # 여기 구분자(---)가 있으면, 반드시 처음[spring:]부터 사용해야 한다.
+#  # 2023.07.03 oracle setting.
+#  # spring.datasource.driver-class-name=oracle.jdbc.OracleDriver => 9 이하 버전 사용.
+#  # scott/tiger: hello world 같은 관례.
+#spring:
+#  datasource:
+#    # Oracle DB
+##    oracle:
+#    driver-class-name: oracle.jdbc.OracleDriver
+#    url: jdbc:oracle:thin:@localhost:1521/xe
+#    username: scott
+#    password: tiger
